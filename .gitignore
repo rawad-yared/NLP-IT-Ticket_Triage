@@ -1,0 +1,44 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/*.executed.ipynb
+
+# Project runtime artifacts
+models/**
+!models/.gitkeep
+!models/**/.gitkeep
+
+outputs/**
+!outputs/.gitkeep
+!outputs/**/.gitkeep
+
+results/**
+!results/.gitkeep
+!results/**/.gitkeep
+
+# Large raw data files
+data/raw/*.csv
+
+# Logs and local temp files
+*.log
+*.tmp
