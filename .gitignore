@@ -24,9 +24,53 @@ env/
 notebooks/*.executed.ipynb
 
 # Project runtime artifacts
+# Keep only minimal inference exports for Streamlit (no training checkpoints/states).
 models/**
 !models/.gitkeep
-!models/**/.gitkeep
+
+!models/department_model/
+models/department_model/**
+!models/department_model/.gitkeep
+!models/department_model/best/
+models/department_model/best/**
+!models/department_model/best/config.json
+!models/department_model/best/model.safetensors
+!models/department_model/best/pytorch_model.bin
+!models/department_model/best/tokenizer.json
+!models/department_model/best/tokenizer_config.json
+!models/department_model/best/special_tokens_map.json
+!models/department_model/best/vocab.json
+!models/department_model/best/merges.txt
+!models/department_model/best/added_tokens.json
+!models/department_model/best/spiece.model
+models/department_model/best/checkpoint-*/
+models/department_model/best/optimizer.pt
+models/department_model/best/scheduler.pt
+models/department_model/best/trainer_state.json
+models/department_model/best/training_args.bin
+models/department_model/best/rng_state.pth
+
+!models/urgency_model/
+models/urgency_model/**
+!models/urgency_model/.gitkeep
+!models/urgency_model/best/
+models/urgency_model/best/**
+!models/urgency_model/best/config.json
+!models/urgency_model/best/model.safetensors
+!models/urgency_model/best/pytorch_model.bin
+!models/urgency_model/best/tokenizer.json
+!models/urgency_model/best/tokenizer_config.json
+!models/urgency_model/best/special_tokens_map.json
+!models/urgency_model/best/vocab.json
+!models/urgency_model/best/merges.txt
+!models/urgency_model/best/added_tokens.json
+!models/urgency_model/best/spiece.model
+models/urgency_model/best/checkpoint-*/
+models/urgency_model/best/optimizer.pt
+models/urgency_model/best/scheduler.pt
+models/urgency_model/best/trainer_state.json
+models/urgency_model/best/training_args.bin
+models/urgency_model/best/rng_state.pth
 
 outputs/**
 !outputs/.gitkeep
