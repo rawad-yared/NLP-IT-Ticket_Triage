@@ -117,46 +117,35 @@ NLP-IT-Ticket_Triage/
   requirements.txt
 ```
 
-## Setup (Clone and Run)
+## Quick Start (No Training Required)
 
-### 1) Clone
+This repository already includes trained inference checkpoints in `models/*/best` tracked with Git LFS.
+You can run the app directly without training from scratch.
+
+### 1) Install Git LFS (one-time on your machine)
 
 ```bash
-git clone <your-repo-url>
-cd NLP-IT-Ticket_Triage
+git lfs install
 ```
 
-### 2) Create and activate virtual environment
+### 2) Clone and download model binaries
+
+```bash
+git clone https://github.com/rawad-yared/NLP-IT-Ticket_Triage.git
+cd NLP-IT-Ticket_Triage
+git lfs pull
+```
+
+### 3) Create virtual environment + install dependencies
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-```
-
-### 3) Install dependencies
-
-```bash
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-### 4) Prepare data subset (optional but recommended)
-
-```bash
-python scripts/create_stratified_subset.py
-```
-
-This creates `data/processed/IT Support Ticket Data.stratified_3000.csv` with stratification.
-
-### 5) Train/Evaluate in notebook
-
-```bash
-jupyter notebook notebooks/01_training_and_eval.ipynb
-```
-
-Run cells top-to-bottom to produce model checkpoints and metrics.
-
-### 6) Launch Streamlit app
+### 4) Run Streamlit
 
 ```bash
 python -m streamlit run app/main.py
@@ -164,13 +153,37 @@ python -m streamlit run app/main.py
 
 Open the local URL shown by Streamlit (typically `http://localhost:8501`).
 
+Required model folders for app inference:
+- `models/department_model/best`
+- `models/urgency_model/best`
+
+## Optional: Train Locally (If You Want to Rebuild Models)
+
+### 1) (Optional) Regenerate stratified subset
+
+```bash
+python scripts/create_stratified_subset.py
+```
+
+### 2) Train/evaluate in notebook
+
+```bash
+jupyter notebook notebooks/01_training_and_eval.ipynb
+```
+
+Run cells top-to-bottom to produce updated checkpoints and metrics.
+
+### 3) Re-run app with your new checkpoints
+
+```bash
+python -m streamlit run app/main.py
+```
+
 ## Notes on First Run Downloads
 
-The first execution may download model weights from Hugging Face:
-- classifiers/tokenizers if checkpoint fallback is used
-- `t5-small` summarizer (if summary is enabled)
-
-After first download, models are cached and startup is faster.
+- If you pulled models via Git LFS, department/urgency checkpoints are already local.
+- `t5-small` summary model may still download on first use if summary is enabled.
+- If summary is disabled in the app, no summary-model download is needed.
 
 ## Common Troubleshooting
 
@@ -195,6 +208,14 @@ python -m streamlit run app/main.py
 ```
 
 This guarantees the same interpreter as your active venv.
+
+### App cannot find model weights after clone
+
+You likely cloned pointers without downloading LFS binaries. Run:
+
+```bash
+git lfs pull
+```
 
 ## Current Status
 
