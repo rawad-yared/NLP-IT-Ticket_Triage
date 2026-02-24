@@ -234,8 +234,8 @@ def _render_triage_tab() -> None:
     except Exception as exc:
         st.error(
             "Could not initialize models. Make sure local checkpoints exist in "
-            "`models/<task>_model/best`, or that the Hugging Face Hub model IDs "
-            "are configured (see README for deployment instructions)."
+            "`models/<task>_model/best`. If you just cloned the repo, run "
+            "`git lfs pull` to download model binaries."
         )
         st.exception(exc)
         return
