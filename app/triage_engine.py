@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 from typing import Any
@@ -70,6 +71,12 @@ GENERIC_NOISE_TOKENS = {
     "platform",
     "team",
     "message",
+}
+
+
+DEFAULT_HUB_MODELS: dict[str, str] = {
+    "department": "rawadyared/it-triage-department",
+    "urgency": "rawadyared/it-triage-urgency",
 }
 
 
@@ -152,19 +159,33 @@ class TicketTriageRuntime:
             out[int(k)] = str(v)
         return out
 
+    def _resolve_model_source(self, task_name: str) -> str:
+        """Return a local path (str) if the model exists on disk, else a HF Hub ID."""
+        local_dir = self._task_model_dir(task_name)
+        if local_dir.exists() and (local_dir / "config.json").is_file():
+            return str(local_dir)
+
+        env_key = f"TRIAGE_MODEL_{task_name.upper()}"
+        env_val = os.environ.get(env_key, "").strip()
+        if env_val:
+            return env_val
+
+        if task_name in DEFAULT_HUB_MODELS:
+            return DEFAULT_HUB_MODELS[task_name]
+
+        raise FileNotFoundError(
+            f"No model found for '{task_name}'. Checked local path "
+            f"({local_dir}), env var ${env_key}, and default Hub models."
+        )
+
     def _load_classifier(self, task_name: str) -> dict[str, Any]:
         if task_name in self._classifier_cache:
             return self._classifier_cache[task_name]
 
-        model_dir = self._task_model_dir(task_name)
-        if not model_dir.exists():
-            raise FileNotFoundError(
-                f"Missing model directory: {model_dir}. "
-                "Run the training notebook first to export best checkpoints."
-            )
+        model_source = self._resolve_model_source(task_name)
 
-        tokenizer = AutoTokenizer.from_pretrained(str(model_dir), use_fast=True)
-        model = AutoModelForSequenceClassification.from_pretrained(str(model_dir))
+        tokenizer = AutoTokenizer.from_pretrained(model_source, use_fast=True)
+        model = AutoModelForSequenceClassification.from_pretrained(model_source)
         model.to(self.device)
         model.eval()
 

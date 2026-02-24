@@ -99,6 +99,8 @@ Evaluation artifacts are written under `results/` and include metrics, predictio
 
 ```text
 NLP-IT-Ticket_Triage/
+  .streamlit/
+    config.toml
   app/
     main.py
     triage_engine.py
@@ -115,6 +117,7 @@ NLP-IT-Ticket_Triage/
   scripts/
     create_stratified_subset.py
   requirements.txt
+  requirements-full.txt
 ```
 
 ## Quick Start (No Training Required)
@@ -156,6 +159,59 @@ Open the local URL shown by Streamlit (typically `http://localhost:8501`).
 Required model folders for app inference:
 - `models/department_model/best`
 - `models/urgency_model/best`
+
+## Deploy to Streamlit Community Cloud
+
+The app can be deployed to [Streamlit Community Cloud](https://streamlit.io/cloud) without Git LFS — models are loaded from Hugging Face Hub instead.
+
+### 1) Upload models to Hugging Face Hub
+
+Create two public repos on [huggingface.co](https://huggingface.co) and upload the files from each local model directory:
+
+```bash
+# Install the HF CLI (one-time)
+pip install huggingface-cli
+
+# Login
+huggingface-cli login
+
+# Upload department model
+huggingface-cli upload rawadyared/it-triage-department models/department_model/best .
+
+# Upload urgency model
+huggingface-cli upload rawadyared/it-triage-urgency models/urgency_model/best .
+```
+
+Each repo should contain: `config.json`, `model.safetensors`, `tokenizer.json`, `tokenizer_config.json`, `special_tokens_map.json`, `vocab.json`, `merges.txt`.
+
+### 2) Deploy on Streamlit Cloud
+
+1. Push this repo to GitHub.
+2. Go to [share.streamlit.io](https://share.streamlit.io) and create a new app pointing to `app/main.py`.
+3. The app will install from `requirements.txt` (slim, CPU-only torch).
+4. On first load the models download from HF Hub automatically.
+
+### 3) (Optional) Override model sources with env vars
+
+If you host models under different HF repo names, set these environment variables in your Streamlit Cloud app settings under **Secrets**:
+
+```toml
+TRIAGE_MODEL_DEPARTMENT = "your-username/your-department-model"
+TRIAGE_MODEL_URGENCY = "your-username/your-urgency-model"
+```
+
+The app resolves models in this order: **local path** > **environment variable** > **default Hub ID**.
+
+### Requirements files
+
+| File | Purpose |
+|------|---------|
+| `requirements.txt` | Slim runtime-only deps (CPU torch) — used by Streamlit Cloud |
+| `requirements-full.txt` | Full deps including training libraries (jupyter, datasets, etc.) |
+
+For local training, install with `pip install -r requirements-full.txt`.
+
+---
 
 ## Optional: Train Locally (If You Want to Rebuild Models)
 
